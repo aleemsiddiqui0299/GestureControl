@@ -4,10 +4,6 @@ import time
 import numpy as np
 import math
 
-from ctypes import cast, POINTER
-from comtypes import CLSCTX_ALL
-from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-import screen_brightness_control as sbc
 
 
 
@@ -61,20 +57,9 @@ if __name__ == '__main__':
     cTime = 0
 
 
-    devices = AudioUtilities.GetSpeakers()
-    interface = devices.Activate(
-        IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-    volume = cast(interface, POINTER(IAudioEndpointVolume))
-    # volume.GetMute()
-    # volume.GetMasterVolumeLevel()
-    volRange = volume.GetVolumeRange()
-    minVol = volRange[0]
-    maxVol = volRange[1]
     vol = 0
     volBar = 400
-    # volume.SetMaste rVolumeLevel(0, None)
-    # volume.SetMasterVolumeLevel(-20.0, None)
-    br = 0
+
     while True:
         blur_factor = 1
         success, img = cap.read()
@@ -100,17 +85,10 @@ if __name__ == '__main__':
             length = math.hypot(x2-x1, y2-y1)
             if(length <= 50):
                 cv2.circle(img, (cx, cy), 12, (0,255,0), cv2.FILLED)
-
-
-            # vol = np.interp(length, [50,300], [minVol, maxVol])
-            # volBar = np.interp(length, [50,300], [400, 150])
+            volBar = np.interp(length, [50,300], [400, 150])
 
             blur_factor = np.interp(length, [50, 300], [1, 25])
-            # br = np.interp(length, [50,300], [0,100])
-            # volume.SetMasterVolumeLevel(vol, None)
-            # sbc.set_brightness(br, display=0)
 
-            # print("Brightness: "+str(sbc.get_brightness()))
         # print(lmList)
 
         cv2.rectangle(img, (50,150), (85, 400), (0,255,0), 3)
