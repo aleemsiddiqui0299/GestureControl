@@ -76,6 +76,7 @@ if __name__ == '__main__':
     # volume.SetMasterVolumeLevel(-20.0, None)
     br = 0
     while True:
+        blur_factor = 1
         success, img = cap.read()
         img , nimg= detector.findHands(img)
         lmList = detector.findPosition(img, draw=False)
@@ -101,14 +102,15 @@ if __name__ == '__main__':
                 cv2.circle(img, (cx, cy), 12, (0,255,0), cv2.FILLED)
 
 
-            vol = np.interp(length, [50,300], [minVol, maxVol])
-            volBar = np.interp(length, [50,300], [400, 150])
+            # vol = np.interp(length, [50,300], [minVol, maxVol])
+            # volBar = np.interp(length, [50,300], [400, 150])
 
-            br = np.interp(length, [50,300], [0,100])
-            volume.SetMasterVolumeLevel(vol, None)
-            sbc.set_brightness(br, display=0)
+            blur_factor = np.interp(length, [50, 300], [1, 25])
+            # br = np.interp(length, [50,300], [0,100])
+            # volume.SetMasterVolumeLevel(vol, None)
+            # sbc.set_brightness(br, display=0)
 
-            print("Brightness: "+str(sbc.get_brightness()))
+            # print("Brightness: "+str(sbc.get_brightness()))
         # print(lmList)
 
         cv2.rectangle(img, (50,150), (85, 400), (0,255,0), 3)
@@ -124,9 +126,9 @@ if __name__ == '__main__':
 
         cv2.putText(img, "FPS: "+str(int(fps)), (10,70), cv2.FONT_HERSHEY_PLAIN,2,(255,0,255), 3)
         cv2.putText(nimg, "FPS: "+str(int(fps)), (10,70), cv2.FONT_HERSHEY_PLAIN,2,(255,0,255), 3)
-        cv2.putText(img, "Brightness: " + str(int(sbc.get_brightness())), (400, 60), cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 255), 3)
-        cv2.putText(nimg, "Brightness: " + str(int(sbc.get_brightness())), (400,60 ), cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 255), 3)
-        cv2.imshow("Image1", cv2.hconcat([img, nimg]))
+        cv2.putText(img, "Brightness: " + str(int(blur_factor)), (400, 60), cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 255), 3)
+        cv2.putText(nimg, "Brightness: " + str(int(blur_factor)), (400,60 ), cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 255), 3)
+        cv2.imshow("Image1", cv2.hconcat([cv2.blur(img,(int(blur_factor),int(blur_factor))), nimg]))
         # cv2.imshow("Image2", nimg)
 
         if cv2.waitKey(1) & 0xFF==ord('q'):
@@ -134,4 +136,6 @@ if __name__ == '__main__':
 
     cap.release()
     cv2.destroyWindow()
+
+
 
