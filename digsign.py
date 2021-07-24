@@ -59,13 +59,19 @@ if __name__ == '__main__':
 
     vol = 0
     volBar = 400
-
+    cpx = 0
+    cpy = 0
+    canvas = np.zeros((480, 640, 3), np.uint8)
     while True:
+
         blur_factor = 1
         success, img = cap.read()
-        img , nimg= detector.findHands(img)
+        img , nimg= detector.findHands(img, draw = False)
         lmList = detector.findPosition(img, draw=False)
         if len(lmList) != 0:
+
+
+
             # print(lmList[2])
             x1, y1 = lmList[4][1], lmList[4][2]
             x2, y2 = lmList[8][1], lmList[8][2]
@@ -84,7 +90,22 @@ if __name__ == '__main__':
 
             length = math.hypot(x2-x1, y2-y1)
             if(length <= 50):
+
+                if cpx == 0 and cpy == 0:
+                    cpx = cx
+                    cpy = cy
+
                 cv2.circle(img, (cx, cy), 12, (0,255,0), cv2.FILLED)
+                cv2.circle(nimg, (cx, cy), 12, (0,255,0), cv2.FILLED)
+                # cv2.circle(canvas, (cx, cy), 5, (0,255,0), cv2.FILLED)
+
+
+                cv2.line(canvas, (cpx, cpy), (cx, cy),(0,255,0), thickness = 5)
+                cpx = cx
+                cpy = cy
+
+
+
             volBar = np.interp(length, [50,300], [400, 150])
 
             blur_factor = np.interp(length, [50, 300], [1, 25])
@@ -106,7 +127,9 @@ if __name__ == '__main__':
         cv2.putText(nimg, "FPS: "+str(int(fps)), (10,70), cv2.FONT_HERSHEY_PLAIN,2,(255,0,255), 3)
         cv2.putText(img, "Blurr: " + str(int(blur_factor)), (400, 60), cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 255), 3)
         cv2.putText(nimg, "Blurr: " + str(int(blur_factor)), (400,60 ), cv2.FONT_HERSHEY_PLAIN, 2, (255, 0, 255), 3)
-        cv2.imshow("Image1", cv2.hconcat([cv2.blur(img,(int(blur_factor),int(blur_factor))), nimg]))
+        # cv2.imshow("Image1", cv2.hconcat([cv2.blur(img,(int(blur_factor),int(blur_factor))), nimg]))
+        cv2.imshow("Image1", cv2.flip(cv2.hconcat([img, canvas]),1))
+        # cv2.imshow("Canvas", cv2.flip(canvas, 1))
         # cv2.imshow("Image2", nimg)
 
         if cv2.waitKey(1) & 0xFF==ord('q'):
